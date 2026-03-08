@@ -1,0 +1,100 @@
+<script type="module">
+
+import { supabase } from "/src/lib/supabase.ts"
+
+/* ---------- modal ---------- */
+
+const modal = document.getElementById("authModal")
+
+document.getElementById("loginBtn")?.addEventListener("click", () => {
+  modal.classList.remove("hidden")
+  modal.classList.add("flex")
+})
+
+document.getElementById("closeModal")?.addEventListener("click", () => {
+  modal.classList.add("hidden")
+})
+
+/* ---------- cambiar vistas ---------- */
+
+const loginView = document.getElementById("loginView")
+const registerView = document.getElementById("registerView")
+
+document.getElementById("openRegister")?.addEventListener("click", () => {
+
+  loginView.classList.add("hidden")
+  registerView.classList.remove("hidden")
+
+})
+
+document.getElementById("openLogin")?.addEventListener("click", () => {
+
+  registerView.classList.add("hidden")
+  loginView.classList.remove("hidden")
+
+})
+
+/* ---------- LOGIN ---------- */
+
+document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+
+  e.preventDefault()
+
+  const email =
+    document.getElementById("loginEmail").value
+
+  const password =
+    document.getElementById("loginPassword").value
+
+  const { error } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+
+  if (error) {
+
+    alert(error.message)
+
+  } else {
+
+    window.location.href = "/notes"
+
+  }
+
+})
+
+/* ---------- REGISTER ---------- */
+
+document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
+
+  e.preventDefault()
+
+  const email =
+    document.getElementById("registerEmail").value
+
+  const password =
+    document.getElementById("registerPassword").value
+
+  const { error } =
+    await supabase.auth.signUp({
+      email,
+      password
+    })
+
+  if (error) {
+
+    alert(error.message)
+
+  } else {
+
+    alert("Cuenta creada correctamente")
+
+    registerView.classList.add("hidden")
+    loginView.classList.remove("hidden")
+
+  }
+
+})
+
+</script>

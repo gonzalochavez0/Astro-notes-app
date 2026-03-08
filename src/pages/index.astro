@@ -1,0 +1,35 @@
+---
+import "../styles/global.css";
+import Navbar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+import AppPreview from "../components/AppPreview.astro";
+import Features from "../components/Features.astro";
+import Experience from "../components/Experience.astro";
+import CTA from "../components/CTA.astro";
+import Footer from "../components/Footer.astro";
+import AuthModal from "../components/AuthModal.astro";
+---
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notas</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <div class="bg-[#f6f7fb] min-h-screen">
+    <Navbar />
+    <AuthModal />
+
+    <Hero />
+    <AppPreview />
+    <Features />
+    <Experience />
+    <CTA />
+    <Footer />
+  </div>
+</html>
