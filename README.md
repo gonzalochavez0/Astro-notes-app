@@ -32,7 +32,6 @@ servidor.
 - [Cómo funciona el autoguardado](#cómo-funciona-el-autoguardado)
 - [Despliegue](#despliegue)
 - [Próximos pasos](#próximos-pasos)
-- [Limitaciones conocidas](#limitaciones-conocidas)
 
 ---
 
@@ -228,14 +227,6 @@ Configuration** en Supabase, si no los correos de confirmación van a apuntar a
 - Reemplazar el `confirm()` del navegador por un aviso con deshacer dentro de la app.
 - Sumar tests del debounce de guardado y de la guarda de sesión (`vitest` + Playwright).
 - Cola offline optimista con `localStorage`.
-
----
-
-## Limitaciones conocidas
-
-- No hay demo publicada: cada clon necesita su propio proyecto de Supabase.
-- Las capturas de la landing son de una versión anterior; el layout cambió un
-  poco (barra lateral responsive, modal de auth real).
 
 ---
 
