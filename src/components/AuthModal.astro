@@ -1,100 +1,219 @@
-<script type="module">
+<div
+  id="authModal"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="authTitle"
+>
+  <div class="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
+    <button
+      id="closeModal"
+      type="button"
+      class="absolute right-4 top-4 text-gray-500 hover:text-gray-800"
+      aria-label="Cerrar"
+    >
+      ✕
+    </button>
 
-import { supabase } from "/src/lib/supabase.ts"
+    <!-- LOGIN -->
+    <div id="loginView">
+      <h2 id="authTitle" class="mb-2 text-center text-2xl font-semibold">Bienvenido</h2>
 
-/* ---------- modal ---------- */
+      <p class="mb-6 text-center text-gray-500">
+        Inicia sesión para acceder a tus notas
+      </p>
 
-const modal = document.getElementById("authModal")
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="text-sm" for="loginEmail">Correo electrónico</label>
+          <input
+            id="loginEmail"
+            type="email"
+            autocomplete="email"
+            required
+            class="mt-1 w-full rounded-lg bg-gray-100 p-3"
+            placeholder="tu@email.com"
+          />
+        </div>
 
-document.getElementById("loginBtn")?.addEventListener("click", () => {
-  modal.classList.remove("hidden")
-  modal.classList.add("flex")
-})
+        <div>
+          <label class="text-sm" for="loginPassword">Contraseña</label>
+          <input
+            id="loginPassword"
+            type="password"
+            autocomplete="current-password"
+            required
+            class="mt-1 w-full rounded-lg bg-gray-100 p-3"
+          />
+        </div>
 
-document.getElementById("closeModal")?.addEventListener("click", () => {
-  modal.classList.add("hidden")
-})
+        <button
+          type="submit"
+          class="w-full rounded-full bg-blue-600 py-3 text-white transition hover:bg-blue-700 disabled:opacity-60"
+        >
+          Iniciar sesión
+        </button>
+      </form>
 
-/* ---------- cambiar vistas ---------- */
+      <p class="mt-6 text-center text-sm">
+        ¿No tienes cuenta?
 
-const loginView = document.getElementById("loginView")
-const registerView = document.getElementById("registerView")
+        <button id="openRegister" type="button" class="font-medium text-blue-600">
+          Regístrate gratis
+        </button>
+      </p>
+    </div>
 
-document.getElementById("openRegister")?.addEventListener("click", () => {
+    <!-- REGISTER -->
+    <div id="registerView" class="hidden">
+      <h2 class="mb-2 text-center text-2xl font-semibold">Crear cuenta</h2>
 
-  loginView.classList.add("hidden")
-  registerView.classList.remove("hidden")
+      <p class="mb-6 text-center text-gray-500">Empieza a guardar tus ideas</p>
 
-})
+      <form id="registerForm" class="space-y-4">
+        <div>
+          <label class="text-sm" for="registerEmail">Correo electrónico</label>
+          <input
+            id="registerEmail"
+            type="email"
+            autocomplete="email"
+            required
+            class="mt-1 w-full rounded-lg bg-gray-100 p-3"
+          />
+        </div>
 
-document.getElementById("openLogin")?.addEventListener("click", () => {
+        <div>
+          <label class="text-sm" for="registerPassword">Contraseña</label>
+          <input
+            id="registerPassword"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="6"
+            class="mt-1 w-full rounded-lg bg-gray-100 p-3"
+          />
+        </div>
 
-  registerView.classList.add("hidden")
-  loginView.classList.remove("hidden")
+        <button
+          type="submit"
+          class="w-full rounded-full bg-blue-600 py-3 text-white transition hover:bg-blue-700 disabled:opacity-60"
+        >
+          Crear cuenta
+        </button>
+      </form>
 
-})
+      <p class="mt-6 text-center text-sm">
+        ¿Ya tienes cuenta?
 
-/* ---------- LOGIN ---------- */
+        <button id="openLogin" type="button" class="font-medium text-blue-600">
+          Inicia sesión
+        </button>
+      </p>
+    </div>
 
-document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+    <p id="authStatus" class="mt-4 text-center text-sm" role="status" aria-live="polite"></p>
+  </div>
+</div>
 
-  e.preventDefault()
+<script>
+  import { supabase, notifyMissingConfig } from "../lib/supabase";
 
-  const email =
-    document.getElementById("loginEmail").value
+  if (!supabase) notifyMissingConfig();
 
-  const password =
-    document.getElementById("loginPassword").value
+  const modal = document.getElementById("authModal");
+  const loginView = document.getElementById("loginView");
+  const registerView = document.getElementById("registerView");
+  const statusEl = document.getElementById("authStatus");
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
 
-  const { error } =
-    await supabase.auth.signInWithPassword({
-      email,
-      password
-    })
-
-  if (error) {
-
-    alert(error.message)
-
-  } else {
-
-    window.location.href = "/notes"
-
+  function setStatus(message, tone = "error") {
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.className =
+      "mt-4 text-center text-sm " + (tone === "error" ? "text-red-600" : "text-green-600");
   }
 
-})
-
-/* ---------- REGISTER ---------- */
-
-document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
-
-  e.preventDefault()
-
-  const email =
-    document.getElementById("registerEmail").value
-
-  const password =
-    document.getElementById("registerPassword").value
-
-  const { error } =
-    await supabase.auth.signUp({
-      email,
-      password
-    })
-
-  if (error) {
-
-    alert(error.message)
-
-  } else {
-
-    alert("Cuenta creada correctamente")
-
-    registerView.classList.add("hidden")
-    loginView.classList.remove("hidden")
-
+  function showView(view) {
+    loginView?.classList.toggle("hidden", view !== "login");
+    registerView?.classList.toggle("hidden", view !== "register");
+    setStatus("");
   }
 
-})
+  function openModal(view = "login") {
+    if (!modal) return;
+    showView(view);
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
 
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove("flex");
+    modal.classList.add("hidden");
+  }
+
+  document.querySelectorAll("[data-auth-open]").forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      openModal(trigger.getAttribute("data-auth-open") || "login");
+    });
+  });
+
+  document.getElementById("closeModal")?.addEventListener("click", closeModal);
+  document.getElementById("openRegister")?.addEventListener("click", () => showView("register"));
+  document.getElementById("openLogin")?.addEventListener("click", () => showView("login"));
+
+  modal?.addEventListener("click", (event) => {
+    if (event.target === modal) closeModal();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeModal();
+  });
+
+  /* ---------- LOGIN ---------- */
+  loginForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!supabase) return;
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    setStatus("Comprobando credenciales...", "success");
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+
+    window.location.href = "/notes";
+  });
+
+  /* ---------- REGISTER ---------- */
+  registerForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!supabase) return;
+
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+
+    setStatus("Creando cuenta...", "success");
+
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+
+    // With "Confirm email" enabled Supabase returns a user but no session.
+    if (data.session) {
+      window.location.href = "/notes";
+      return;
+    }
+
+    showView("login");
+    setStatus("Cuenta creada. Revisa tu correo para confirmarla.", "success");  });
 </script>

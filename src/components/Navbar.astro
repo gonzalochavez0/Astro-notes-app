@@ -1,43 +1,60 @@
-    <header
-      id="navbar"
-      class="fixed top-0 left-0 w-full z-50 transition-all duration-300"
-    >
-      <div class="flex justify-between items-center px-10 py-5">
-        <div class="flex items-center gap-2 font-semibold text-lg">
-          <div
-            class="w-8 h-8 rounded-lg bg-linear-to-r from-purple-500 to-indigo-500 flex items-center justify-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="w-4 h-4"
-            >
-              <path
-                d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
-              ></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-          </div>
-
-          Notas
-        </div>
-
-        <nav class="flex items-center gap-8 text-sm">
-          <a href="#features" class="hover:text-purple-600">
-            Características
-          </a>
-
-          <button
-            id="loginBtn"
-            class="px-4 py-2 bg-blue-600 text-white rounded-full"
-          >
-            Iniciar sesión
-          </button>
-        </nav>
+<header
+  id="navbar"
+  class="fixed top-0 left-0 z-50 w-full transition-all duration-300"
+>
+  <div class="flex items-center justify-between px-6 py-5 md:px-10">
+    <a href="/" class="flex items-center gap-2 text-lg font-semibold">
+      <div
+        class="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-r from-purple-500 to-indigo-500"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-4 w-4"
+          aria-hidden="true"
+        >
+          <path d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
       </div>
-    </header>
+
+      Notas
+    </a>
+
+    <nav class="flex items-center gap-4 text-sm md:gap-8">
+      <a href="#features" class="hidden hover:text-purple-600 sm:block">
+        Características
+      </a>
+
+      <button
+        type="button"
+        data-auth-open="login"
+        class="rounded-full bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+      >
+        Iniciar sesión
+      </button>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const navbar = document.getElementById("navbar");
+
+  if (navbar) {
+    const onScroll = () => {
+      const scrolled = window.scrollY > 40;
+      navbar.classList.toggle("backdrop-blur-md", scrolled);
+      navbar.classList.toggle("bg-white/70", scrolled);
+      navbar.classList.toggle("shadow-sm", scrolled);
+      navbar.classList.toggle("border-b", scrolled);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+</script>
