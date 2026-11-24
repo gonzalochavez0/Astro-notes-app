@@ -5,70 +5,87 @@
 ![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20Postgres-3ECF8E?logo=supabase&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 
-A small, fast notes app: sign up with email, write, and every keystroke is saved
-for you. Notes are stored per user in Postgres and protected by Row Level
-Security, so the browser never receives anyone else's data.
+Una app de notas chica y rápida: te registrás con tu correo, escribís y cada
+tecla se guarda sola. Las notas se guardan por usuario en Postgres y están
+protegidas con Row Level Security, así que el navegador nunca recibe datos de
+otra persona.
 
-The project exists to show a **complete auth + database slice**: a marketing
-landing page, a modal authentication flow, a protected editor route, and a
-database schema with ownership rules that are enforced on the server.
+El proyecto existe para mostrar un **recorrido completo de autenticación +
+base de datos**: una landing page, un flujo de login en modal, una ruta de editor
+protegida y un esquema con reglas de propiedad que se aplican del lado del
+servidor.
 
 <p align="center">
-  <img src="docs/images/landing.png" alt="Landing page with the notes app preview" />
+  <img src="docs/images/landing.png" alt="Landing page con la vista previa de la app de notas" />
 </p>
 
 ---
 
-## Features
+## Tabla de contenidos
 
-| Feature | How it works |
-| ------- | ------------ |
-| **Email sign up / sign in** | Supabase Auth (`signUp`, `signInWithPassword`) from a modal on the landing page |
-| **Autosave** | Debounced 600 ms writes to Postgres while typing; status line shows *Guardando… / Guardado ✓* |
-| **Note management** | Create, edit and delete notes, with a confirmation before deleting |
-| **Search** | Case-insensitive filter on title **and** content, applied instantly in the sidebar |
-| **Per-user isolation** | Row Level Security policies on `public.notes`; the app only ever receives the signed-in user's rows |
-| **Session guard** | `/notes` checks the session on load and sends anonymous visitors back to the landing page |
-| **Responsive** | Sidebar and editor stack vertically on mobile and sit side by side from `md` |
+- [Características](#características)
+- [Arquitectura](#arquitectura)
+- [Stack tecnológico](#stack-tecnológico)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Modelo de datos](#modelo-de-datos)
+- [Cómo funciona el autoguardado](#cómo-funciona-el-autoguardado)
+- [Despliegue](#despliegue)
+- [Próximos pasos](#próximos-pasos)
+- [Limitaciones conocidas](#limitaciones-conocidas)
+
+---
+
+## Características
+
+| Funcionalidad | Cómo funciona |
+| ------------- | ------------- |
+| **Registro e inicio de sesión con correo** | Supabase Auth (`signUp`, `signInWithPassword`) desde un modal en la landing |
+| **Autoguardado** | Escrituras a Postgres con debounce de 600 ms mientras escribís; la línea de estado muestra *Guardando… / Guardado ✓* |
+| **Gestión de notas** | Crear, editar y borrar, con confirmación antes de eliminar |
+| **Búsqueda** | Filtro insensible a mayúsculas sobre el título **y** el contenido, aplicado al instante en la barra lateral |
+| **Aislamiento por usuario** | Políticas de Row Level Security en `public.notes`; la app solo recibe las filas del usuario logueado |
+| **Guarda de sesión** | `/notes` verifica la sesión al cargar y devuelve a la landing a quien no está logueado |
+| **Responsive** | La barra lateral y el editor se apilan en móvil y se ponen lado a lado desde `md` |
 
 <p align="center">
-  <img src="public/images/notes-preview.png" alt="Editor view with the note list on the left" width="70%" />
+  <img src="public/images/notes-preview.png" alt="Vista del editor con la lista de notas a la izquierda" width="70%" />
 </p>
 
 ---
 
-## Architecture
+## Arquitectura
 
 ```mermaid
 flowchart LR
-    U["Browser<br/>Astro + Tailwind"] -->|"signIn / signUp"| A["Supabase Auth"]
+    U["Navegador<br/>Astro + Tailwind"] -->|"signIn / signUp"| A["Supabase Auth"]
     U -->|"select / insert / update / delete"| P["Supabase PostgREST"]
     P --> R{"Row Level Security<br/>auth.uid() = user_id"}
     R --> T[("public.notes")]
     A -.->|"JWT"| P
 ```
 
-The frontend is statically built; all data access happens from the browser with
-the **anon key**, which is safe because every policy in `supabase/schema.sql`
-filters by `auth.uid()`.
+El frontend se compila estático; todo el acceso a datos ocurre desde el
+navegador con la **anon key**, que es segura porque cada política de
+`supabase/schema.sql` filtra por `auth.uid()`.
 
 ---
 
-## Tech stack
+## Stack tecnológico
 
-- **Astro 5** — static pages, zero-by-default JS, one `<script>` island per page
-- **Tailwind CSS 4** — via `@tailwindcss/vite`
-- **Supabase** — Auth, Postgres and PostgREST
-- **TypeScript** — strict mode for the client library
+- **Astro 5** — páginas estáticas, cero JS por defecto, un `<script>` por página
+- **Tailwind CSS 4** — vía `@tailwindcss/vite`
+- **Supabase** — Auth, Postgres y PostgREST
+- **TypeScript** — modo estricto para la librería de cliente
 
 ---
 
-## Project structure
+## Estructura del proyecto
 
 ```text
 Astro-notes-app/
 ├── src/
-│   ├── components/          # landing sections + auth modal
+│   ├── components/          # secciones de la landing + modal de auth
 │   │   ├── Navbar.astro
 │   │   ├── Hero.astro
 │   │   ├── AppPreview.astro
@@ -76,32 +93,32 @@ Astro-notes-app/
 │   │   ├── Experience.astro
 │   │   ├── CTA.astro
 │   │   ├── Footer.astro
-│   │   └── AuthModal.astro  # markup + login/register logic
+│   │   └── AuthModal.astro  # markup + lógica de login/registro
 │   ├── layouts/
-│   │   └── Layout.astro     # <head>, fonts, global styles
+│   │   └── Layout.astro     # <head>, tipografías, estilos globales
 │   ├── lib/
-│   │   └── supabase.ts      # client + missing-config banner
+│   │   └── supabase.ts      # cliente + banner de configuración faltante
 │   ├── pages/
-│   │   ├── index.astro      # landing + auth modal
-│   │   └── notes.astro      # protected editor
+│   │   ├── index.astro      # landing + modal de auth
+│   │   └── notes.astro      # editor protegido
 │   └── styles/global.css
 ├── public/
-│   ├── images/              # images used by the site
+│   ├── images/              # imágenes que usa el sitio
 │   └── favicon.svg
 ├── supabase/
-│   └── schema.sql           # table, RLS policies, index, trigger
-├── docs/images/             # screenshots used in this README
+│   └── schema.sql           # tabla, políticas RLS, índice y trigger
+├── docs/images/             # capturas usadas en este README
 ├── .env.example
 └── package.json
 ```
 
 ---
 
-## Getting started
+## Puesta en marcha
 
-**Requirements:** Node.js ≥ 20 and a free [Supabase](https://supabase.com/) project.
+**Requisitos:** Node.js ≥ 20 y un proyecto gratuito de [Supabase](https://supabase.com/).
 
-### 1. Install
+### 1. Instalar
 
 ```bash
 git clone https://github.com/gonzalochavez0/Astro-notes-app.git
@@ -109,56 +126,56 @@ cd Astro-notes-app
 npm install
 ```
 
-### 2. Create the database
+### 2. Crear la base de datos
 
-1. Open your Supabase project → **SQL Editor** → **New query**.
-2. Paste the contents of [`supabase/schema.sql`](supabase/schema.sql) and run it.
-3. Go to **Authentication → Providers** and make sure **Email** is enabled.
-   With *Confirm email* turned off you can log in immediately after signing up;
-   with it on, the app tells the user to check their inbox.
+1. Abrí tu proyecto en Supabase → **SQL Editor** → **New query**.
+2. Pegá el contenido de [`supabase/schema.sql`](supabase/schema.sql) y ejecutalo.
+3. Andá a **Authentication → Providers** y verificá que **Email** esté habilitado.
+   Con *Confirm email* desactivado podés iniciar sesión apenas te registrás; con
+   la opción activa, la app le avisa al usuario que revise su correo.
 
-### 3. Configure the environment
+### 3. Configurar el entorno
 
 ```bash
 cp .env.example .env
 ```
 
-Then fill in **Project Settings → API**:
+Después completá con **Project Settings → API**:
 
-| Variable | Where to find it |
-| -------- | ---------------- |
+| Variable | Dónde encontrarla |
+| -------- | ----------------- |
 | `PUBLIC_SUPABASE_URL` | Project URL |
-| `PUBLIC_SUPABASE_ANON_KEY` | `anon` / `public` API key |
+| `PUBLIC_SUPABASE_ANON_KEY` | API key `anon` / `public` |
 
-Both values ship to the browser by design — they are identifiers, not secrets.
-Access control lives in the database policies.
+Ambos valores viajan al navegador a propósito: son identificadores, no secretos.
+El control de acceso vive en las políticas de la base de datos.
 
-### 4. Run
+### 4. Ejecutar
 
 ```bash
 npm run dev      # http://localhost:4321
-npm run build    # static output in dist/
+npm run build    # salida estática en dist/
 ```
 
-If the variables are missing, the app shows a red banner explaining what to do
-instead of failing silently.
+Si faltan las variables, la app muestra un banner rojo explicando qué hacer en
+lugar de fallar en silencio.
 
 ---
 
-## Data model
+## Modelo de datos
 
 `public.notes`:
 
-| Column | Type | Notes |
-| ------ | ---- | ----- |
-| `id` | `uuid` | Primary key, `gen_random_uuid()` |
-| `user_id` | `uuid` | References `auth.users`, `on delete cascade` |
-| `title` | `text` | Defaults to `Nueva nota` |
-| `content` | `text` | Defaults to `''` |
-| `created_at` | `timestamptz` | Defaults to `now()`; used to order the list |
-| `updated_at` | `timestamptz` | Maintained by the `notes_set_updated_at` trigger |
+| Columna | Tipo | Notas |
+| ------- | ---- | ----- |
+| `id` | `uuid` | Clave primaria, `gen_random_uuid()` |
+| `user_id` | `uuid` | Referencia a `auth.users`, `on delete cascade` |
+| `title` | `text` | Por defecto `Nueva nota` |
+| `content` | `text` | Por defecto `''` |
+| `created_at` | `timestamptz` | Por defecto `now()`; ordena la lista |
+| `updated_at` | `timestamptz` | La mantiene el trigger `notes_set_updated_at` |
 
-Every table row is readable only by its owner:
+Cada fila solo puede ser leída por su dueño:
 
 ```sql
 alter table public.notes enable row level security;
@@ -168,55 +185,58 @@ create policy "Users can read their own notes"
   using (auth.uid() = user_id);
 ```
 
-`update` policies also use `with check`, so a user cannot reassign a note to
-somebody else. The full set of four policies (select / insert / update / delete)
-is in `supabase/schema.sql`.
+Las políticas de `update` también usan `with check`, así que un usuario no puede
+reasignar una nota a otra persona. El juego completo de cuatro políticas
+(select / insert / update / delete) está en `supabase/schema.sql`.
 
 ---
 
-## How autosave works
+## Cómo funciona el autoguardado
 
-1. `input` on the title or content field clears the pending timer.
-2. A new 600 ms timer is scheduled.
-3. When it fires, the note is updated in Postgres, the local array is patched
-   optimistically and the sidebar is re-rendered.
-4. The status line reports `Guardando…`, `Guardado ✓` or the error message
-   returned by Supabase.
+1. Un evento `input` en el título o en el contenido limpia el timer pendiente.
+2. Se programa un nuevo timer de 600 ms.
+3. Cuando se dispara, la nota se actualiza en Postgres, el arreglo local se
+   parchea de forma optimista y la barra lateral se vuelve a dibujar.
+4. La línea de estado informa `Guardando…`, `Guardado ✓` o el error que devuelva
+   Supabase.
 
-There is no dirty-state tracking beyond the timer: if the tab is closed within
-those 600 ms, that edit is lost. See [roadmap](#roadmap).
-
----
-
-## Deployment
-
-Any static host works (Vercel, Netlify, Cloudflare Pages, GitHub Pages):
-
-- **Build command:** `npm run build`
-- **Output directory:** `dist`
-- **Environment variables:** `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`
-
-Remember to add your production domain to **Authentication → URL Configuration**
-in Supabase, otherwise confirmation emails will point to `localhost`.
+No hay seguimiento de cambios sucios más allá del timer: si cerrás la pestaña
+dentro de esos 600 ms, esa edición se pierde. Ver
+[próximos pasos](#próximos-pasos).
 
 ---
 
-## Roadmap
+## Despliegue
 
-- Flush pending saves on `beforeunload` / `visibilitychange` so nothing is lost.
-- Add pagination or a virtualised list for users with hundreds of notes.
-- Replace the `confirm()` dialog with an in-app undo toast.
-- Add tests for the save debounce and the session guard (`vitest` + Playwright).
-- Optimistic offline queue with `localStorage`.
+Cualquier hosting estático sirve (Vercel, Netlify, Cloudflare Pages, GitHub Pages):
 
----
+- **Comando de build:** `npm run build`
+- **Directorio de salida:** `dist`
+- **Variables de entorno:** `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`
 
-## Known limitations
-
-- There is no hosted demo: each clone needs its own Supabase project.
-- The landing-page screenshots were captured from an earlier build; the layout
-  changed slightly (responsive sidebar, real auth modal).
+Acordate de agregar tu dominio de producción en **Authentication → URL
+Configuration** en Supabase, si no los correos de confirmación van a apuntar a
+`localhost`.
 
 ---
 
-**Author:** Gonzalo Chavez · [@gonzalochavez0](https://github.com/gonzalochavez0)
+## Próximos pasos
+
+- Vaciar las escrituras pendientes en `beforeunload` / `visibilitychange` para no
+  perder nada.
+- Agregar paginación o una lista virtualizada para usuarios con cientos de notas.
+- Reemplazar el `confirm()` del navegador por un aviso con deshacer dentro de la app.
+- Sumar tests del debounce de guardado y de la guarda de sesión (`vitest` + Playwright).
+- Cola offline optimista con `localStorage`.
+
+---
+
+## Limitaciones conocidas
+
+- No hay demo publicada: cada clon necesita su propio proyecto de Supabase.
+- Las capturas de la landing son de una versión anterior; el layout cambió un
+  poco (barra lateral responsive, modal de auth real).
+
+---
+
+**Autor:** Gonzalo Chavez · [@gonzalochavez0](https://github.com/gonzalochavez0)
